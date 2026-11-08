@@ -674,6 +674,17 @@
             </div>
           </div>
 
+          {difficulty === 'advanced' && (
+            <div className="mb-4 text-xs sm:text-sm text-purple-800 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2 leading-relaxed">
+              <div className="font-bold mb-1"><i className="fa-solid fa-circle-info mr-1"></i>入力のしかた</div>
+              <ul className="list-disc pl-5 space-y-0.5">
+                <li>物質の数は問題によって違います。<b>使わない枠は「–」と空欄のまま</b>にしてください。</li>
+                <li>化学式は <b>H2O</b>、<b>Ca(OH)2</b> のように、数字もそのまま入力します（小さい添え字は不要です）。</li>
+                <li>係数が1のときも、<b>「1」を選んでください</b>。</li>
+              </ul>
+            </div>
+          )}
+
           {resultData.errorMsg && (
             <div className="mb-4 text-center text-rose-600 font-bold bg-rose-50 p-3 rounded-xl border border-rose-200 text-sm">
               <i className="fa-solid fa-triangle-exclamation mr-1"></i>{resultData.errorMsg}
