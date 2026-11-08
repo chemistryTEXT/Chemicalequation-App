@@ -17,6 +17,8 @@
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
+    summary::-webkit-details-marker { display: none; }
+    details[open] > summary .chev { transform: rotate(180deg); }
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
@@ -282,6 +284,164 @@
         if (diff === 'advanced') return `['${esc(q.title)}', '${esc(q.text)}', '${esc(eq)}', '${esc(q.explanation)}'],`;
         return `['${esc(q.title)}', '${esc(eq)}', '${esc(q.explanation)}'],`;
       }).join('\n');
+    };
+
+    // --- 解説ページのデータ ---
+    // steps: [説明, 反応式]。'->' は不可逆、'<->' は可逆反応。イオンの電荷は ⁺ ⁻ をそのまま書く。
+    const GUIDE = [
+      {
+        id: 'h2so4', name: '硫酸の製造（接触法）', product: '硫酸 H₂SO₄',
+        raw: '硫黄 S または 黄鉄鉱 FeS₂、空気（酸素）、水',
+        steps: [
+          ['① 硫黄を燃やして二酸化硫黄にする', 'S + O2 -> SO2'],
+          ['（黄鉄鉱を焙焼する場合）', '4FeS2 + 11O2 -> 2Fe2O3 + 8SO2'],
+          ['② SO₂ を酸化して SO₃ にする　触媒: 酸化バナジウム(V) V₂O₅、約400〜500℃', '2SO2 + O2 <-> 2SO3'],
+          ['③ SO₃ を水と反応させて硫酸にする', 'SO3 + H2O -> H2SO4']
+        ],
+        points: [
+          '②は発熱反応の可逆反応。低温ほど平衡は有利だが反応が遅いので、触媒を使って適温で行う。',
+          'SO₃ を水に直接吸収させると霧状になって吸収しにくい。実際は濃硫酸に吸収させて発煙硫酸にし、希硫酸で薄めて濃硫酸にする。',
+          '濃硫酸の性質: 不揮発性・吸湿性・脱水作用。熱濃硫酸は強い酸化力をもつ（Cu と反応して SO₂ が発生）。'
+        ]
+      },
+      {
+        id: 'hno3', name: '硝酸の製造（オストワルト法）', product: '硝酸 HNO₃',
+        raw: 'アンモニア NH₃、空気（酸素）、水',
+        steps: [
+          ['① アンモニアを酸化して NO にする　触媒: 白金 Pt、約800℃', '4NH3 + 5O2 -> 4NO + 6H2O'],
+          ['② NO を酸化して NO₂ にする', '2NO + O2 -> 2NO2'],
+          ['③ NO₂ を温水に吸収させる', '3NO2 + H2O -> 2HNO3 + NO'],
+          ['全体をまとめると', 'NH3 + 2O2 -> HNO3 + H2O']
+        ],
+        points: [
+          '③で生じた NO は②にもどして再利用する。',
+          '原料のアンモニアは、ハーバー・ボッシュ法でつくる。',
+          '硝酸は肥料（硝酸アンモニウムなど）や火薬の原料になる。'
+        ]
+      },
+      {
+        id: 'nh3', name: 'アンモニアの製造（ハーバー・ボッシュ法）', product: 'アンモニア NH₃',
+        raw: '窒素 N₂（空気から）、水素 H₂（天然ガスなどから）',
+        steps: [
+          ['窒素と水素を直接反応させる　触媒: 四酸化三鉄 Fe₃O₄ を主成分とする鉄触媒、約400〜600℃、約2×10⁷〜1×10⁸ Pa', 'N2 + 3H2 <-> 2NH3'],
+          ['（水素の製造の例: 水蒸気改質）', 'CH4 + H2O -> CO + 3H2']
+        ],
+        points: [
+          '発熱反応で、反応により気体の分子数が減る。ルシャトリエの原理から、低温・高圧ほど NH₃ が得られやすい。',
+          '低温では反応が遅いので、触媒を使って適温（400〜600℃）で行う。高圧にするほど収率が上がる。',
+          'アンモニアは硝酸・尿素・硫酸アンモニウム（硫安）などの原料になる。化学肥料の大もと。'
+        ]
+      },
+      {
+        id: 'soda', name: 'ソーダ工業（アンモニアソーダ法・ソルベー法）', product: '炭酸ナトリウム Na₂CO₃',
+        raw: '塩化ナトリウム（食塩）、石灰石、アンモニア（回収して再利用）',
+        steps: [
+          ['① 石灰石を熱分解して CO₂ と生石灰をつくる', 'CaCO3 -> CaO + CO2'],
+          ['② 飽和食塩水にアンモニアと CO₂ を通じて炭酸水素ナトリウムを沈殿させる', 'NaCl + NH3 + H2O + CO2 -> NaHCO3 + NH4Cl'],
+          ['③ 炭酸水素ナトリウムを加熱して炭酸ナトリウムにする', '2NaHCO3 -> Na2CO3 + H2O + CO2'],
+          ['④ 生石灰に水を加えて消石灰にする', 'CaO + H2O -> Ca(OH)2'],
+          ['⑤ 塩化アンモニウムから NH₃ を回収する', '2NH4Cl + Ca(OH)2 -> CaCl2 + 2NH3 + 2H2O'],
+          ['全体をまとめると', '2NaCl + CaCO3 -> Na2CO3 + CaCl2']
+        ],
+        points: [
+          '②で NaHCO₃ が沈殿するのは、NaHCO₃ の溶解度が小さいから。',
+          '③で出る CO₂ は②に、⑤で回収した NH₃ も②に再利用する。',
+          '最終的に、原料は NaCl と CaCO₃、副産物は CaCl₂ になる。',
+          '炭酸ナトリウムはガラス・せっけん・紙などの原料になる。'
+        ]
+      },
+      {
+        id: 'naoh', name: '水酸化ナトリウムの製造（イオン交換膜法）', product: '水酸化ナトリウム NaOH（と Cl₂、H₂）',
+        raw: '飽和食塩水',
+        steps: [
+          ['陽極の反応', '2Cl⁻ -> Cl2 + 2e⁻'],
+          ['陰極の反応', '2H2O + 2e⁻ -> H2 + 2OH⁻'],
+          ['全体をまとめると', '2NaCl + 2H2O -> 2NaOH + Cl2 + H2']
+        ],
+        points: [
+          '陽イオン交換膜は Na⁺ だけを通し、Cl⁻ や OH⁻ は通さない。陰極側に NaOH ができ、塩化物イオンが混ざらない高純度の NaOH が得られる。',
+          '陽極から塩素 Cl₂、陰極から水素 H₂ が同時に得られる。',
+          '塩素は漂白剤・殺菌剤・塩化ビニルなどの原料になる。'
+        ]
+      },
+      {
+        id: 'al', name: 'アルミニウムの製造（溶融塩電解・ホール・エルー法）', product: 'アルミニウム Al',
+        raw: 'ボーキサイト → 精製した酸化アルミニウム Al₂O₃（アルミナ）、氷晶石 Na₃AlF₆、炭素電極',
+        steps: [
+          ['陰極の反応（Al が融けて底にたまる）', 'Al³⁺ + 3e⁻ -> Al'],
+          ['陽極の反応（炭素電極が消耗する）', 'C + 2O²⁻ -> CO2 + 4e⁻'],
+          ['全体をまとめると', '2Al2O3 + 3C -> 4Al + 3CO2']
+        ],
+        points: [
+          'Al₂O₃ の融点は約2000℃と高い。融けた氷晶石に溶かすと約1000℃で電解できる。',
+          'Al は水溶液の電気分解では得られない（水が先に還元されて H₂ が出る）ため、溶融塩電解を使う。',
+          '大量の電力が必要なので「電気の缶詰」とよばれる。リサイクルすると、新しく作るより、ずっと少ないエネルギーですむ。',
+          '陽極の炭素が酸素と反応して消耗するため、電極は交換が必要。'
+        ]
+      },
+      {
+        id: 'fe', name: '鉄の製造（溶鉱炉・転炉）', product: '銑鉄 → 鋼',
+        raw: '鉄鉱石（Fe₂O₃ など）、コークス、石灰石',
+        steps: [
+          ['コークスの燃焼（熱源）', 'C + O2 -> CO2'],
+          ['CO の生成', 'CO2 + C -> 2CO'],
+          ['鉄鉱石の還元', 'Fe2O3 + 3CO -> 2Fe + 3CO2'],
+          ['石灰石の分解とスラグ（ケイ酸カルシウム）の生成', 'CaCO3 -> CaO + CO2'],
+          ['', 'CaO + SiO2 -> CaSiO3']
+        ],
+        points: [
+          '溶鉱炉で得られる鉄を銑鉄といい、炭素を約4％含む。かたいがもろい。',
+          '銑鉄を転炉に入れ、酸素を吹き込んで炭素を減らしたものが鋼（炭素 0.02〜2％）。強くて粘りがある。',
+          'スラグ（鉱さい）はセメントの原料などに使われる。'
+        ]
+      },
+      {
+        id: 'cu', name: '銅の製造（電解精錬）', product: '純銅 Cu（純度 99.99％以上）',
+        raw: '黄銅鉱 CuFeS₂ などの銅鉱石',
+        steps: [
+          ['粗銅（純度約99％）をつくる（自己還元の例）', 'Cu2S + O2 -> 2Cu + SO2'],
+          ['電解精錬　陽極: 粗銅　陰極: 純銅　電解液: 硫酸酸性の硫酸銅(II)水溶液', 'Cu -> Cu²⁺ + 2e⁻'],
+          ['', 'Cu²⁺ + 2e⁻ -> Cu']
+        ],
+        points: [
+          'Cu よりイオン化傾向が大きい金属（Zn・Fe・Ni など）は、イオンとして溶液中に残る。',
+          'Cu よりイオン化傾向が小さい金属（Ag・Au など）は、陽極の下に沈む（陽極泥）。',
+          '陽極泥から貴金属（金・銀など）を回収できる。'
+        ]
+      },
+      {
+        id: 'etc', name: 'その他の重要な工業反応', product: '尿素・メタノール・ケイ素・ガラス',
+        raw: '',
+        steps: [
+          ['尿素の合成（肥料）', '2NH3 + CO2 -> CO(NH2)2 + H2O'],
+          ['メタノールの合成', 'CO + 2H2 -> CH3OH'],
+          ['ケイ素の製造（半導体の材料）', 'SiO2 + 2C -> Si + 2CO'],
+          ['ガラスの製造（ソーダ石灰ガラス）', 'Na2CO3 + SiO2 -> Na2SiO3 + CO2']
+        ],
+        points: [
+          '尿素は、アンモニアと二酸化炭素から高温・高圧でつくる窒素肥料。',
+          'メタノールは、一酸化炭素と水素から触媒を使ってつくる。'
+        ]
+      }
+    ];
+
+    // 解説用の反応式を、添え字つきで表示する
+    const renderGuideEq = (eq) => {
+      const rev = eq.includes('<->');
+      const [l, r] = eq.split(rev ? '<->' : '->');
+      const side = (str) => parseSide(str.trim()).map((t, idx) => (
+        <Fragment key={idx}>
+          {idx > 0 && <span className="mx-1 text-slate-400 font-bold">+</span>}
+          <span className="font-bold text-slate-800">{t.coeff > 1 ? t.coeff : ''}{fmtForm(t.formula)}</span>
+        </Fragment>
+      ));
+      return (
+        <div className="flex items-center flex-wrap text-base sm:text-lg leading-loose">
+          {side(l)}
+          <span className="mx-2 text-teal-600 font-black">{rev ? '⇌' : '→'}</span>
+          {side(r)}
+        </div>
+      );
     };
 
     const renderEq = (leftTerms, rightTerms) => {
@@ -570,6 +730,10 @@
                     </div>
                   </div>
 
+                  <button onClick={() => setScreen('guide')} className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow text-sm">
+                    <i className="fa-solid fa-book-open mr-2"></i>解説ページ（工業的に重要な反応）
+                  </button>
+
                   {aiError && (
                     <div className="text-left text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-2">
                       <i className="fa-solid fa-triangle-exclamation mr-1"></i>{aiError}
@@ -593,6 +757,67 @@
                 </div>
               )}
             </div>
+          </div>
+        );
+      }
+
+      if (screen === 'guide') {
+        return (
+          <div className="flex-grow flex flex-col max-w-3xl w-full mx-auto p-4">
+            <div className="flex justify-between items-center mb-4">
+              <button onClick={() => setScreen('home')} className="bg-white px-3 py-1.5 rounded-lg shadow-sm border text-sm font-bold">
+                <i className="fa-solid fa-house mr-1"></i>ホーム
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-md p-5 mb-4 border-l-4 border-amber-500">
+              <h2 className="font-black text-xl text-slate-800 mb-1"><i className="fa-solid fa-book-open text-amber-500 mr-2"></i>工業的に重要な反応まとめ</h2>
+              <p className="text-sm text-slate-600">項目をタップすると、反応式と覚えるポイントが開きます。</p>
+              <p className="text-xs text-slate-400 mt-2">※ 温度・圧力などの数値は代表的な目安です。授業で使う教科書・資料にあわせて確認してください。</p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4 text-sm text-amber-900">
+              <div className="font-bold mb-1">つながりのイメージ</div>
+              <ul className="list-disc pl-5 space-y-0.5">
+                <li>N₂ → NH₃（ハーバー・ボッシュ法）→ HNO₃（オストワルト法）→ 肥料・火薬</li>
+                <li>NaCl・CaCO₃ → Na₂CO₃（ソルベー法）→ ガラス・せっけん</li>
+                <li>NaCl 水溶液 → NaOH・Cl₂・H₂（イオン交換膜法）</li>
+                <li>鉱石 → 金属（Fe は還元、Al は溶融塩電解、Cu は電解精錬）</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              {GUIDE.map(g => (
+                <details key={g.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                  <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="font-bold text-slate-800">{g.name}</div>
+                      <div className="text-xs text-slate-500 mt-0.5">製品: {g.product}</div>
+                    </div>
+                    <i className="chev fa-solid fa-chevron-down text-slate-400 transition-transform"></i>
+                  </summary>
+                  <div className="px-4 pb-4 pt-3 border-t border-slate-100 space-y-3">
+                    {g.raw && <div className="text-sm text-slate-600"><span className="font-bold text-slate-700">原料: </span>{g.raw}</div>}
+                    <div className="space-y-2">
+                      {g.steps.map(([label, eq], i) => (
+                        <div key={i} className="bg-slate-50 rounded-xl border border-slate-200 px-3 py-2">
+                          {label && <div className="text-xs sm:text-sm text-slate-600 mb-0.5">{label}</div>}
+                          {renderGuideEq(eq)}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+                      <div className="text-sm font-bold text-emerald-800 mb-1"><i className="fa-solid fa-lightbulb mr-1"></i>覚えるポイント</div>
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700 leading-relaxed">
+                        {g.points.map((pt, i) => <li key={i}>{pt}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+
+            <button onClick={() => setScreen('home')} className="mt-5 w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow">ホームへ戻る</button>
           </div>
         );
       }
