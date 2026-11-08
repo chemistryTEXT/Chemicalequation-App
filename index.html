@@ -323,7 +323,7 @@
               value={String(coeff)}
               onChange={(e) => onCoeffChange(e.target.value)}
             >
-              <option value="">{isAdvanced ? '–' : '係'}</option>
+              <option value="">–</option>
               {Array.from({ length: MAX_COEFF }, (_, n) => n + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
             </select>
             {isBeginner ? (
