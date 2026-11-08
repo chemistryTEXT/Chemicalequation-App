@@ -40,6 +40,7 @@
     // 反応式は「係数+化学式」を ' + ' でつなぎ、'->' で左右に分けた文字列で管理します。
     const QUIZ_LEN = 10; // 1回の出題数（組み込み問題）
     const AI_COUNT = 10; // AI新問で一度に作る問題数
+    const MAX_COEFF = 12; // 係数プルダウンの最大値
     const RAW = {
       // [タイトル, 反応式, 解説]
       beginner: [
@@ -250,6 +251,7 @@
         const norm = (terms) => terms.map(t => ({ formula: toHalf(String(t.formula)), coeff: Number(t.coeff) }));
         const left = norm(q.left), right = norm(q.right);
         if (!isBalanced(left, right)) return null;
+        if ([...left, ...right].some(t => t.coeff > MAX_COEFF)) return null; // プルダウンで選べる範囲を超える係数は除外
         const out = {
           id: `ai${i}`,
           title: q.title || 'AI生成問題',
@@ -314,12 +316,16 @@
             {isBeginner ? '係数' : '係数 / 化学式'}
           </div>
           <div className="flex items-center space-x-1">
-            <input
-              type="number" min="1" max="99" disabled={disabled}
-              className="w-11 h-10 text-center text-base font-bold border-2 border-slate-300 rounded-lg focus:border-teal-500 outline-none disabled:bg-slate-100"
-              placeholder="係" value={coeff}
+            <select
+              disabled={disabled}
+              aria-label="係数"
+              className="w-[3.25rem] h-10 text-center text-base font-bold border-2 border-slate-300 rounded-lg focus:border-teal-500 outline-none bg-white disabled:bg-slate-100"
+              value={String(coeff)}
               onChange={(e) => onCoeffChange(e.target.value)}
-            />
+            >
+              <option value="">{isAdvanced ? '–' : '係'}</option>
+              {Array.from({ length: MAX_COEFF }, (_, n) => n + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+            </select>
             {isBeginner ? (
               <div className="text-lg font-bold px-1.5 text-slate-700 min-w-[2.5rem] text-center">
                 {fmtForm(formula)}
@@ -490,7 +496,7 @@
           const lOk = inputs.left.every(t => String(t.coeff).trim() !== '' && t.formula.trim() !== '');
           const rOk = inputs.right.every(t => String(t.coeff).trim() !== '' && t.formula.trim() !== '');
           if (!lOk || !rOk) {
-            setResultData({ shown: false, isCorrect: false, errorMsg: 'すべての空欄を埋めてください（係数1も「1」を入力）。' });
+            setResultData({ shown: false, isCorrect: false, errorMsg: 'すべての空欄を選んでください（係数1も「1」を選択）。' });
             return;
           }
         } else {
